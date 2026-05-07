@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinFlip Game - Decentralized Casino</title>
+    <style>
+        :root {
+            --main-bg: #181c1f;
+            --accent: #ffb300;
+            --accent2: #00e0d3;
+            --surface: #23272a;
+            --text: #f3f3f3;
+            --muted: #8a8f98;
+            --danger: #ff4d6d;
+            --radius: 18px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.25);
+            --font-main: 'JetBrains Mono', monospace;
+            --font-head: 'Bebas Neue', sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: repeating-linear-gradient(135deg, var(--main-bg) 0 40px, #23272a 40px 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-main);
+            color: var(--text);
+            padding: 20px;
+        }
+        
+        .container {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            animation: fadein 0.8s ease-out;
+        }
+        
+        @keyframes fadein {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+        
+        .connect-btn {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: #181c1f;
+            font-family: var(--font-head);
+            font-size: 1.2rem;
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.8rem 1.5rem;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, filter 0.2s;
+        }
+        
+        .connect-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+        
+        .status {
+            background: #1a1d21;
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            border-left: 3px solid var(--accent2);
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        
+        .game-controls {
+            margin: 1.5rem 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent2);
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 12px;
+            border: 1px solid var(--accent2);
+            background: #1a1d21;
+            color: var(--text);
+            margin-bottom: 1rem;
+            font-family: var(--font-main);
+        }
+        
+        .guess-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .guess-btn {
+            flex: 1;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .guess-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        #headsBtn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        #tailsBtn {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+        
+        .history {
+            margin-top: 2rem;
+            background: #1a1d21;
+            border-radius: var(--radius);
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .history h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        
+        th, td {
+            padding: 0.5rem;
+            text-align: center;
+            border-bottom: 1px solid #2a2d31;
+        }
+        
+        th {
+            background: #23272a;
+            color: var(--accent2);
+        }
+        
+        .won {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        .lost {
+            color: #f44336;
+        }
+        
+        .pending {
+            color: var(--accent);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .guess-btn {
+                padding: 0.7rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪙 COINFLIP GAME</h1>
+        
+        <button class="connect-btn" id="connectBtn">🔌 Connect Wallet</button>
+        
+        <div id="walletInfo" style="display: none;">
+            <div class="status">
+                <div>📍 Address: <span id="userAddress">-</span></div>
+                <div>💰 Your Balance: <span id="userBalance">0</span> ETH</div>
+                <div>🏦 Contract Balance: <span id="contractBalance">0</span> ETH</div>
+            </div>
+            <div class="status" id="nftStatus" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
+            
+            <div class="game-controls">
+                <label>🎲 Bet Amount (ETH)</label>
+                <input type="number" id="betAmount" step="0.001" min="0.001" max="1" value="0.01">
+                
+                <label>🔮 Choose Side</label>
+                <div class="guess-buttons">
+                    <button id="headsBtn" class="guess-btn">🪙 HEADS</button>
+                    <button id="tailsBtn" class="guess-btn">🪙 TAILS</button>
+                </div>
+            </div>
+            
+            <div id="message" class="status" style="display: none;"></div>
+            
+            <div class="history">
+                <h3>📜 Game History</h3>
+                <table id="historyTable">
+                    <thead>
+                        <tr><th>ID</th><th>Bet (ETH)</th><th>Your Guess</th><th>Result</th><th>Status</th><th>Outcome</th></tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <tr><td colspan="6">Connect wallet to see history</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+    <script>
+        // ============================================
+        // CONFIGURATION - UPDATE AFTER DEPLOYMENT
+        // ============================================
+        // Replace with your deployed contract address!
+        const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; // ← UPDATE THIS!
+        
+        // Complete ABI for CoinFlip.sol
+        // Paste your CoinFlip ABI below for frontend use
+        const CONTRACT_ABI = [
+            {"inputs":[{"internalType":"address","name":"_achievementNFT","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"GameCancelled","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"betAmount","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"guess","type":"uint8"}],"name":"GameCreated","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"result","type":"uint8"},{"indexed":false,"internalType":"bool","name":"won","type":"bool"},{"indexed":false,"internalType":"uint256","name":"payout","type":"uint256"}],"name":"GameResult","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
+            {"inputs":[],"name":"HOUSE_EDGE","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"MAX_BET","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"MAX_RANDOM","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"MIN_BET","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"NFT_WIN_THRESHOLD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"achievementNFT","outputs":[{"internalType":"contract AchievementNFT","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"cancelGame","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint8","name":"_guess","type":"uint8"}],"name":"flipCoin","outputs":[],"stateMutability":"payable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint8","name":"guess","type":"uint8"},{"internalType":"uint8","name":"result","type":"uint8"},{"internalType":"enum CoinFlip.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"bool","name":"won","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getContractBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGame","outputs":[{"components":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint8","name":"guess","type":"uint8"},{"internalType":"uint8","name":"result","type":"uint8"},{"internalType":"enum CoinFlip.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"},{"internalType":"bool","name":"won","type":"bool"}],"internalType":"struct CoinFlip.Game","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerGames","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"nextGameId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"playerGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerWins","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"resolveGame","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"setPlayerWinForTest","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"stateMutability":"payable","type":"receive"}
+        ];
+        // Paste your AchievementNFT ABI below for frontend use
+        // Replace with your deployed AchievementNFT contract address!
+        const ACHIEVEMENT_NFT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // ← UPDATE THIS!
+        const ACHIEVEMENT_NFT_ABI = [
+            {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},
+            {"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasMinted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"nextTokenId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        ];
+
+        // ============================================
+        // GLOBAL VARIABLES
+        // ============================================
+        let provider, signer, contract, userAddress, achievementNFT;
+        
+        // DOM Elements
+        const connectBtn = document.getElementById('connectBtn');
+        const walletInfo = document.getElementById('walletInfo');
+        const headsBtn = document.getElementById('headsBtn');
+        const tailsBtn = document.getElementById('tailsBtn');
+        const betAmountInput = document.getElementById('betAmount');
+        const messageDiv = document.getElementById('message');
+        const userAddressSpan = document.getElementById('userAddress');
+        const userBalanceSpan = document.getElementById('userBalance');
+        const contractBalanceSpan = document.getElementById('contractBalance');
+        const historyBody = document.getElementById('historyBody');
+
+            // ============================================
+        // CONNECT WALLET
+        // ============================================
+        connectBtn.onclick = async () => {
+            try {
+                if (!window.ethereum) {
+                    alert('❌ Please install MetaMask!');
+                    return;
+                }
+                messageDiv.style.display = 'block';
+                messageDiv.innerText = '🔄 Connecting to wallet...';
+                provider = new ethers.BrowserProvider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = await provider.getSigner();
+                userAddress = await signer.getAddress();
+                // Check if contract address is set
+                if (CONTRACT_ADDRESS === "0x5FbDB2315678afecb367f032d93F642f64180aa3") {
+                    messageDiv.innerText = '⚠️ Please update CONTRACT_ADDRESS in the code after deploying your contract!';
+                    return;
+                }
+                contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                // Create AchievementNFT contract instance
+                if (ACHIEVEMENT_NFT_ADDRESS === "YOUR_ACHIEVEMENT_NFT_CONTRACT_ADDRESS") {
+                    console.warn('Please update ACHIEVEMENT_NFT_ADDRESS with your deployed NFT contract address.');
+                } else {
+                    achievementNFT = new ethers.Contract(ACHIEVEMENT_NFT_ADDRESS, ACHIEVEMENT_NFT_ABI, signer);
+                }
+                // Display address
+                userAddressSpan.innerText = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+                await updateBalances();
+                await loadGameHistory();
+                await updateNFTStatus();
+                // Listen for GameResult events
+                contract.on("GameResult", async (gameId, result, won, payout) => {
+                    const resultText = won ? '🎉 WINNER!' : '😢 LOST!';
+                    const payoutText = won ? ` Won ${ethers.formatEther(payout)} ETH` : '';
+                    showMessage(`${resultText}${payoutText} - Result: ${result == 0 ? 'HEADS' : 'TAILS'}`, won ? 'success' : 'error');
+                    await updateBalances();
+                    await loadGameHistory();
+                });
+                walletInfo.style.display = "block";
+                connectBtn.style.display = "none";
+                messageDiv.style.display = "none";
+                // Update balances every 10 seconds
+                setInterval(updateBalances, 10000);
+                setInterval(loadGameHistory, 15000);
+                setInterval(updateNFTStatus, 15000);
+                    // ============================================
+                    // UPDATE NFT STATUS
+                    // ============================================
+                    async function updateNFTStatus() {
+                        const nftStatusDiv = document.getElementById('nftStatus');
+                        if (!achievementNFT || !userAddress) {
+                            nftStatusDiv.style.display = 'none';
+                            return;
+                        }
+                        try {
+                            // Check if user has minted NFT
+                            const hasMinted = await achievementNFT.hasMinted(userAddress);
+                            if (hasMinted) {
+                                nftStatusDiv.innerHTML = '🏅 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Achievement NFT</span>!';
+                                nftStatusDiv.style.display = 'block';
+                                return;
+                            }
+                            // Count user wins from CoinFlip contract
+                            const gameIds = await contract.getPlayerGames(userAddress);
+                            let winCount = 0;
+                            for (let i = 0; i < gameIds.length; i++) {
+                                const game = await contract.getGame(gameIds[i]);
+                                if (game.won) winCount++;
+                            }
+                            const winsNeeded = Math.max(0, 10 - winCount);
+                            nftStatusDiv.innerHTML = winsNeeded === 0
+                                ? '🏅 <b>Eligible for NFT!</b> Please wait for your NFT to be minted.'
+                                : `🏆 Wins: <b>${winCount}</b> / 10 &mdash; <span style="color:#ffb300">${winsNeeded} more win${winsNeeded === 1 ? '' : 's'}</span> needed for NFT!`;
+                            nftStatusDiv.style.display = 'block';
+                        } catch (err) {
+                            nftStatusDiv.style.display = 'none';
+                        }
+                    }
+            } catch (error) {
+                console.error("Connection error:", error);
+                messageDiv.innerText = `❌ Connection failed: ${error.message}`;
+            }
+        };
+
+        // ============================================
+        // PLAY GAME
+        // ============================================
+        async function playGame(guess) {
+            if (!contract) {
+                showMessage('Please connect wallet first!', 'error');
+                return;
+            }
+            const betAmount = betAmountInput.value;
+            if (!betAmount || betAmount <= 0) {
+                showMessage('Please enter a valid bet amount (0.001 - 1 ETH)', 'error');
+                return;
+            }
+            if (betAmount < 0.001) {
+                showMessage('Minimum bet is 0.001 ETH', 'error');
+                return;
+            }
+            if (betAmount > 1) {
+                showMessage('Maximum bet is 1 ETH', 'error');
+                return;
+            }
+            showMessage(`🪙 Flipping coin... Betting ${betAmount} ETH on ${guess == 0 ? 'HEADS' : 'TAILS'}`, 'info');
+            try {
+                // 1. Place the bet (flipCoin)
+                const tx = await contract.flipCoin(guess, {
+                    value: ethers.parseEther(betAmount),
+                    gasLimit: 300000
+                });
+                showMessage(`⏳ Transaction submitted! Waiting for confirmation... Tx: ${tx.hash.slice(0,10)}...`, 'info');
+                const receipt = await tx.wait();
+                console.log("Transaction confirmed:", receipt);
+                await updateBalances();
+                // 2. Get the latest gameId for this user
+                const gameIds = await contract.getPlayerGames(userAddress);
+                const latestGameId = gameIds[gameIds.length - 1];
+                // 3. Resolve the game
+                showMessage('🎲 Resolving game, please confirm the next transaction in MetaMask...', 'info');
+                const resolveTx = await contract.resolveGame(latestGameId, { gasLimit: 300000 });
+                showMessage(`⏳ Resolving... Waiting for confirmation... Tx: ${resolveTx.hash.slice(0,10)}...`, 'info');
+                await resolveTx.wait();
+                showMessage('✅ Game resolved! Check your game history and status below.', 'success');
+                await updateBalances();
+                await loadGameHistory();
+                await updateNFTStatus();
+            } catch (error) {
+                console.error("Game error:", error);
+                let errorMsg = error.message;
+                if (error.message && error.message.includes("insufficient funds")) {
+                    errorMsg = "Insufficient ETH balance!";
+                } else if (error.message && error.message.includes("Contract insufficient balance")) {
+                    errorMsg = "Contract doesn't have enough funds! Please tell the owner to fund the contract.";
+                }
+                showMessage(`❌ Error: ${errorMsg}`, 'error');
+            }
+        }
+        
+        headsBtn.onclick = () => playGame(0);
+        tailsBtn.onclick = () => playGame(1);
+
+        // ============================================
+        // UPDATE BALANCES
+        // ============================================
+        async function updateBalances() {
+            if (!contract || !signer) return;
+            try {
+                const userBalance = await provider.getBalance(userAddress);
+                const contractBalance = await contract.getContractBalance();
+                userBalanceSpan.innerText = parseFloat(ethers.formatEther(userBalance)).toFixed(4);
+                contractBalanceSpan.innerText = parseFloat(ethers.formatEther(contractBalance)).toFixed(4);
+            } catch (error) {
+                console.error("Balance update error:", error);
+            }
+        }
+
+        // ============================================
+        // LOAD GAME HISTORY
+        // ============================================
+        async function loadGameHistory() {
+            if (!contract || !userAddress) return;
+            
+            historyBody.innerHTML = '<tr><td colspan="6">Loading history...</td></tr>';
+            
+            try {
+                const gameIds = await contract.getPlayerGames(userAddress);
+                
+                if (gameIds.length === 0) {
+                    historyBody.innerHTML = '<tr><td colspan="6">No games played yet</td></tr>';
+                    return;
+                }
+                
+                historyBody.innerHTML = '';
+                
+                // Load last 10 games only (for performance)
+                const recentGames = gameIds.slice(-10);
+                
+                for (let i = recentGames.length - 1; i >= 0; i--) {
+                    const gameId = recentGames[i];
+                    const game = await contract.getGame(gameId);
+                    
+                    const statusText = ['🟡 Open', '✅ Completed', '❌ Cancelled'][game.status];
+                    const outcomeText = game.won ? '🏆 WON' : '💀 LOST';
+                    const outcomeClass = game.won ? 'won' : 'lost';
+                    const resultText = game.result == 2 ? '⏳ Pending' : (game.result == 0 ? '🪙 Heads' : '🪙 Tails');
+                    const guessText = game.guess == 0 ? '🪙 Heads' : '🪙 Tails';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${game.gameId.toString()}</td>
+                        <td>${ethers.formatEther(game.betAmount)}</td>
+                        <td>${guessText}</td>
+                        <td>${resultText}</td>
+                        <td>${statusText}</td>
+                        <td class="${outcomeClass}">${outcomeText}</td>
+                    `;
+                    historyBody.appendChild(row);
+                }
+                
+            } catch (error) {
+                console.error("History error:", error);
+                historyBody.innerHTML = '<tr><td colspan="6">Error loading history</td></tr>';
+            }
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function showMessage(msg, type = 'info') {
+            messageDiv.style.display = 'block';
+            messageDiv.innerText = msg;
+            
+            if (type === 'error') {
+                messageDiv.style.borderLeftColor = '#ff4d6d';
+                messageDiv.style.color = '#ff4d6d';
+            } else if (type === 'success') {
+                messageDiv.style.borderLeftColor = '#4caf50';
+                messageDiv.style.color = '#4caf50';
+            } else {
+                messageDiv.style.borderLeftColor = '#00e0d3';
+                messageDiv.style.color = '#f3f3f3';
+            }
+            
+            setTimeout(() => {
+                if (type !== 'error') {
+                    messageDiv.style.display = 'none';
+                }
+            }, 5000);
+        }
+        
+        // Set default bet amount
+        betAmountInput.value = "0.01";
+        
+        console.log("Frontend loaded. Ready to connect!");
+    </script>
+</body>
+</html>
