@@ -33,10 +33,29 @@ async function main() {
   await fundTx.wait();
   console.log("✅ CoinFlip funded with 10 ETH");
 
-  // 5) Print frontend values
+  // 5) Deploy Lottery contracts
+  const LotteryTicket = await hre.ethers.getContractFactory("LotteryTicket");
+  const lotteryTicket = await LotteryTicket.deploy();
+  await lotteryTicket.waitForDeployment();
+  const lotteryTicketAddress = await lotteryTicket.getAddress();
+  console.log(`✅ LotteryTicket NFT deployed to: ${lotteryTicketAddress}`);
+
+  const Lottery = await hre.ethers.getContractFactory("Lottery");
+  const lottery = await Lottery.deploy(lotteryTicketAddress);
+  await lottery.waitForDeployment();
+  const lotteryAddress = await lottery.getAddress();
+  console.log(`✅ Lottery game deployed to: ${lotteryAddress}`);
+
+  const ltTx = await lotteryTicket.setLotteryContract(lotteryAddress);
+  await ltTx.wait();
+  console.log("✅ LotteryTicket minting rights given to Lottery contract");
+
+  // 6) Print frontend values
   console.log("\n📝 Frontend config:");
   console.log(`CONTRACT_ADDRESS = "${coinFlipAddress}"`);
   console.log(`ACHIEVEMENT_NFT_ADDRESS = "${achievementNFTAddress}"`);
+  console.log(`LOTTERY_ADDRESS = "${lotteryAddress}"`);
+  console.log(`LOTTERY_TICKET_ADDRESS = "${lotteryTicketAddress}"`);
 }
 
 main().catch((error) => {

@@ -210,7 +210,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🪙 COINFLIP GAME</h1>
+        <h1>🪙 Lucky Ledger</h1>
         
         <button class="connect-btn" id="connectBtn">🔌 Connect Wallet</button>
         
@@ -223,6 +223,7 @@
             <div class="status" id="nftStatus" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
             
             <div class="game-controls">
+                <h3 style="color: var(--accent); margin-bottom: 0.5rem">🪙 CoinFlip Game</h3>
                 <label>🎲 Bet Amount (ETH)</label>
                 <input type="number" id="betAmount" step="0.001" min="0.001" max="1" value="0.01">
                 
@@ -231,6 +232,16 @@
                     <button id="headsBtn" class="guess-btn">🪙 HEADS</button>
                     <button id="tailsBtn" class="guess-btn">🪙 TAILS</button>
                 </div>
+            </div>
+
+            <div class="game-controls" style="border-top: 1px solid #333; padding-top: 1.5rem; margin-top: 1.5rem;">
+                <h3 style="color: var(--accent); margin-bottom: 0.5rem">🎟️ Lottery Game</h3>
+                <div class="status" style="margin-bottom: 1rem;">
+                    <div>🎫 Tickets Sold This Round: <span id="ticketsSold">0</span> / 20</div>
+                    <div>🏆 Current Prize Pool: <span id="currentPool">0</span> / 1.0 ETH</div>
+                </div>
+                <button id="buyTicketBtn" class="connect-btn" style="margin-bottom: 1rem; background: linear-gradient(90deg, #ff4d6d, #f093fb);">Buy Ticket (0.05 ETH)</button>
+                <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 1rem;">🤖 Winner is drawn automatically when pool reaches 1 ETH (20 tickets).</div>
             </div>
             
             <div id="message" class="status" style="display: none;"></div>
@@ -255,7 +266,7 @@
         // CONFIGURATION - UPDATE AFTER DEPLOYMENT
         // ============================================
         // Replace with your deployed contract address!
-        const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; // ← UPDATE THIS!
+        const CONTRACT_ADDRESS = "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE";
         
         // Complete ABI for CoinFlip.sol
         // Paste your CoinFlip ABI below for frontend use
@@ -290,7 +301,7 @@
         ];
         // Paste your AchievementNFT ABI below for frontend use
         // Replace with your deployed AchievementNFT contract address!
-        const ACHIEVEMENT_NFT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // ← UPDATE THIS!
+        const ACHIEVEMENT_NFT_ADDRESS = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"; // ← UPDATE THIS!
         const ACHIEVEMENT_NFT_ABI = [
             {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
             {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},
@@ -318,10 +329,37 @@
             {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
 
+        const LOTTERY_ADDRESS = "0x9A676e781A523b5d0C0e43731313A708CB607508"; 
+        const LOTTERY_ABI = [
+            {"inputs":[{"internalType":"address","name":"_ticketNFT","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"buyer","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"round","type":"uint256"}],"name":"TicketPurchased","type":"event"},
+            {"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"round","type":"uint256"},{"indexed":true,"internalType":"address","name":"winner","type":"address"},{"indexed":false,"internalType":"uint256","name":"prize","type":"uint256"}],"name":"WinnerDrawn","type":"event"},
+            {"inputs":[],"name":"POOL_THRESHOLD","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"buyTicket","outputs":[],"stateMutability":"payable","type":"function"},
+            {"inputs":[],"name":"currentPool","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"currentRoundTickets","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"getTicketsSoldCurrentRound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"lotteryRound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"ticketNFT","outputs":[{"internalType":"contract LotteryTicket","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"ticketPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"drawWinner","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"getTicketsSoldCurrentRound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"lotteryRound","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},
+            {"inputs":[],"name":"ticketNFT","outputs":[{"internalType":"contract LotteryTicket","name":"","type":"address"}],"stateMutability":"view","type":"function"},
+            {"inputs":[],"name":"ticketPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+            {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}
+        ];
+
         // ============================================
         // GLOBAL VARIABLES
         // ============================================
-        let provider, signer, contract, userAddress, achievementNFT;
+        let provider, signer, contract, userAddress, achievementNFT, lotteryContract;
         
         // DOM Elements
         const connectBtn = document.getElementById('connectBtn');
@@ -335,7 +373,12 @@
         const contractBalanceSpan = document.getElementById('contractBalance');
         const historyBody = document.getElementById('historyBody');
 
-            // ============================================
+            // UI Elements
+        const ticketsSoldSpan = document.getElementById('ticketsSold');
+        const currentPoolSpan = document.getElementById('currentPool');
+        const buyTicketBtn = document.getElementById('buyTicketBtn');
+
+        // ============================================
         // CONNECT WALLET
         // ============================================
         connectBtn.onclick = async () => {
@@ -356,6 +399,7 @@
                     return;
                 }
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                lotteryContract = new ethers.Contract(LOTTERY_ADDRESS, LOTTERY_ABI, signer);
                 // Create AchievementNFT contract instance
                 if (ACHIEVEMENT_NFT_ADDRESS === "YOUR_ACHIEVEMENT_NFT_CONTRACT_ADDRESS") {
                     console.warn('Please update ACHIEVEMENT_NFT_ADDRESS with your deployed NFT contract address.');
@@ -371,10 +415,27 @@
                 contract.on("GameResult", async (gameId, result, won, payout) => {
                     const resultText = won ? '🎉 WINNER!' : '😢 LOST!';
                     const payoutText = won ? ` Won ${ethers.formatEther(payout)} ETH` : '';
-                    showMessage(`${resultText}${payoutText} - Result: ${result == 0 ? 'HEADS' : 'TAILS'}`, won ? 'success' : 'error');
+                    showMessage(`CoinFlip: ${resultText}${payoutText} - Result: ${result == 0 ? 'HEADS' : 'TAILS'}`, won ? 'success' : 'error');
                     await updateBalances();
                     await loadGameHistory();
                 });
+
+                lotteryContract.on("TicketPurchased", async (buyer, tokenId, round) => {
+                    if (buyer === userAddress) {
+                        showMessage(`🎟️ Ticket #${tokenId} successfully purchased for Round ${round}!`, 'success');
+                    }
+                    await updateBalances();
+                });
+
+                lotteryContract.on("WinnerDrawn", async (round, winner, prize) => {
+                    if (winner === userAddress) {
+                        showMessage(`🏆 JACKPOT! You won Round ${round} and received ${ethers.formatEther(prize)} ETH!`, 'success');
+                    } else {
+                        showMessage(`🎟️ Round ${round} ended! Winner: ${winner.slice(0,6)}... Won: ${ethers.formatEther(prize)} ETH`, 'info');
+                    }
+                    await updateBalances();
+                });
+
                 walletInfo.style.display = "block";
                 connectBtn.style.display = "none";
                 messageDiv.style.display = "none";
@@ -481,19 +542,42 @@
         tailsBtn.onclick = () => playGame(1);
 
         // ============================================
-        // UPDATE BALANCES
+        // UPDATE BALANCES & LOTTERY
         // ============================================
         async function updateBalances() {
             if (!contract || !signer) return;
             try {
-                const userBalance = await provider.getBalance(userAddress);
-                const contractBalance = await contract.getContractBalance();
-                userBalanceSpan.innerText = parseFloat(ethers.formatEther(userBalance)).toFixed(4);
-                contractBalanceSpan.innerText = parseFloat(ethers.formatEther(contractBalance)).toFixed(4);
+                const userBal = await provider.getBalance(userAddress);
+                const contractBal = await contract.getContractBalance();
+                userBalanceSpan.innerText = parseFloat(ethers.formatEther(userBal)).toFixed(4);
+                contractBalanceSpan.innerText = parseFloat(ethers.formatEther(contractBal)).toFixed(4);
+
+                if (lotteryContract) {
+                    const tickets = await lotteryContract.getTicketsSoldCurrentRound();
+                    const pool = await lotteryContract.currentPool();
+                    document.getElementById('ticketsSold').innerText = tickets.toString();
+                    document.getElementById('currentPool').innerText = parseFloat(ethers.formatEther(pool)).toFixed(4);
+                }
             } catch (error) {
-                console.error("Balance update error:", error);
+                console.error("Update error:", error);
             }
         }
+
+        // ============================================
+        // LOTTERY FUNCTIONS
+        // ============================================
+        buyTicketBtn.onclick = async () => {
+            if (!lotteryContract) return;
+            try {
+                showMessage('🎟️ Purchasing lottery ticket (0.05 ETH)... Please wait for confirmation.', 'info');
+                const tx = await lotteryContract.buyTicket({ value: ethers.parseEther("0.05") });
+                await tx.wait();
+                await updateBalances();
+            } catch (error) {
+                console.error(error);
+                showMessage(`❌ Failed to buy ticket: ${error.message.substring(0, 50)}`, 'error');
+            }
+        };
 
         // ============================================
         // LOAD GAME HISTORY
