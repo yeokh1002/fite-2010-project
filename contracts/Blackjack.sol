@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "./BlackjackAchievementNFT.sol";
+
 contract Blackjack {
     address public owner;
     uint256 public nextGameId = 1;
+    
+    BlackjackAchievementNFT public achievementNFT;
+    mapping(address => uint256) public playerWins;
     
     enum GameStatus { None, Active, Won, Lost, Tie }
     
@@ -25,8 +30,9 @@ contract Blackjack {
     event Hit(uint256 indexed gameId, address indexed player, uint8 card);
     event Stand(uint256 indexed gameId, address indexed player, uint8[] dealerCards, GameStatus status);
     
-    constructor() {
+    constructor(address _achievementNFT) {
         owner = msg.sender;
+        achievementNFT = BlackjackAchievementNFT(_achievementNFT);
     }
     
     // Very simple pseudo-random card generator (1-13)
@@ -121,7 +127,15 @@ contract Blackjack {
             game.status = GameStatus.Won;
             activeGames[msg.sender] = 0; // End game
             payable(msg.sender).transfer(msg.value * 2);
+            _handleWin(msg.sender);
             emit Stand(gameId, msg.sender, game.dealerHand, GameStatus.Won);
+        }
+    }
+    
+    function _handleWin(address player) internal {
+        playerWins[player]++;
+        if (playerWins[player] >= 3 && !achievementNFT.hasMinted(player)) {
+            achievementNFT.mint(player);
         }
     }
     
@@ -163,6 +177,7 @@ contract Blackjack {
         if (dealerTotal > 21 || playerTotal > dealerTotal) {
             game.status = GameStatus.Won;
             payable(msg.sender).transfer(game.betAmount * 2);
+            _handleWin(msg.sender);
         } else if (playerTotal == dealerTotal) {
             game.status = GameStatus.Tie;
             payable(msg.sender).transfer(game.betAmount);

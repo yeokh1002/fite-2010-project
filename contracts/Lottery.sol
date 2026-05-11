@@ -4,9 +4,11 @@ pragma solidity ^0.8.19;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./security/ReentrancyGuard.sol";
 import "./LotteryTicket.sol";
+import "./LotteryAchievementNFT.sol";
 
 contract Lottery is Ownable, ReentrancyGuard {
     LotteryTicket public ticketNFT;
+    LotteryAchievementNFT public achievementNFT;
     
     uint256 public ticketPrice = 0.05 ether;
     uint256 public currentPool;
@@ -19,8 +21,9 @@ contract Lottery is Ownable, ReentrancyGuard {
     event TicketPurchased(address indexed buyer, uint256 indexed tokenId, uint256 round);
     event WinnerDrawn(uint256 indexed round, address indexed winner, uint256 prize);
 
-    constructor(address _ticketNFT) Ownable() {
+    constructor(address _ticketNFT, address _achievementNFT) Ownable() {
         ticketNFT = LotteryTicket(_ticketNFT);
+        achievementNFT = LotteryAchievementNFT(_achievementNFT);
     }
 
     // Buy a ticket NFT representing an entry in the current round
@@ -59,6 +62,10 @@ contract Lottery is Ownable, ReentrancyGuard {
 
         (bool success, ) = payable(winner).call{value: prize}("");
         require(success, "Transfer failed");
+
+        if (!achievementNFT.hasMinted(winner)) {
+            achievementNFT.mint(winner);
+        }
 
         emit WinnerDrawn(lotteryRound - 1, winner, prize);
     }

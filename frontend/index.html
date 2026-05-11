@@ -234,6 +234,7 @@
                 </div>
             </div>
 
+            <div class="status" id="nftStatus_lottery" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
             <div class="game-controls" style="border-top: 1px solid #333; padding-top: 1.5rem; margin-top: 1.5rem;">
                 <h3 style="color: var(--accent); margin-bottom: 0.5rem">🎟️ Lottery Game</h3>
                 <div class="status" style="margin-bottom: 1rem;">
@@ -244,6 +245,7 @@
                 <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 1rem;">🤖 Winner is drawn automatically when pool reaches 1 ETH (20 tickets).</div>
             </div>
 
+            <div class="status" id="nftStatus_blackjack" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
             <div class="game-controls" style="border-top: 1px solid #333; padding-top: 1.5rem; margin-top: 1.5rem;">
                 <h3 style="color: var(--accent); margin-bottom: 0.5rem">🃏 Blackjack Game</h3>
                 <label>🎲 Bet Amount (ETH)</label>
@@ -284,7 +286,7 @@
         // CONFIGURATION - UPDATE AFTER DEPLOYMENT
         // ============================================
         // Replace with your deployed contract address!
-        const CONTRACT_ADDRESS = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"; // ← UPDATE THIS!
+        const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; // ← UPDATE THIS!
         
         // Complete ABI for CoinFlip.sol
         // Paste your CoinFlip ABI below for frontend use
@@ -319,7 +321,7 @@
         ];
         // Paste your AchievementNFT ABI below for frontend use
         // Replace with your deployed AchievementNFT contract address!
-        const ACHIEVEMENT_NFT_ADDRESS = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"; // ← UPDATE THIS!
+        const ACHIEVEMENT_NFT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // ← UPDATE THIS!
         const ACHIEVEMENT_NFT_ABI = [
             {"inputs":[],"stateMutability":"nonpayable","type":"constructor"},
             {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},
@@ -347,7 +349,9 @@
             {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
 
-        const LOTTERY_ADDRESS = "0x9A676e781A523b5d0C0e43731313A708CB607508"; 
+        const LOTTERY_ADDRESS = "0x0165878A594ca255338adfa4d48449f69242Eb8F"; 
+        const LOTTERY_ACHIEVEMENT_NFT_ADDRESS = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
+        const BLACKJACK_ACHIEVEMENT_NFT_ADDRESS = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
         const LOTTERY_ABI = [
             {"inputs":[{"internalType":"address","name":"_ticketNFT","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},
             {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},
@@ -374,13 +378,13 @@
             {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
 
-        const BLACKJACK_ADDRESS = "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"; // update upon deploy
-        const BLACKJACK_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"bet","type":"uint256"}],"name":"GameStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint8","name":"card","type":"uint8"}],"name":"Hit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint8[]","name":"dealerCards","type":"uint8[]"},{"indexed":false,"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"}],"name":"Stand","type":"event"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"activeGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getDealerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGame","outputs":[{"components":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint8[]","name":"playerHand","type":"uint8[]"},{"internalType":"uint8[]","name":"dealerHand","type":"uint8[]"},{"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"internalType":"struct Blackjack.Game","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8[]","name":"hand","type":"uint8[]"}],"name":"getHandTotal","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerGames","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getStatus","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"hit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"nextGameId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"playerGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"stand","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startGame","outputs":[],"stateMutability":"payable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+        const BLACKJACK_ADDRESS = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"; // update upon deploy
+        const BLACKJACK_ABI = [{"inputs":[{"internalType":"address","name":"_achievementNFT","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"bet","type":"uint256"}],"name":"GameStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint8","name":"card","type":"uint8"}],"name":"Hit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint8[]","name":"dealerCards","type":"uint8[]"},{"indexed":false,"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"}],"name":"Stand","type":"event"},{"inputs":[],"name":"achievementNFT","outputs":[{"internalType":"contract BlackjackAchievementNFT","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"activeGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getDealerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGame","outputs":[{"components":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint8[]","name":"playerHand","type":"uint8[]"},{"internalType":"uint8[]","name":"dealerHand","type":"uint8[]"},{"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"internalType":"struct Blackjack.Game","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8[]","name":"hand","type":"uint8[]"}],"name":"getHandTotal","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerGames","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getStatus","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"hit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"nextGameId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"playerGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"playerWins","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"stand","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startGame","outputs":[],"stateMutability":"payable","type":"function"},{"stateMutability":"payable","type":"receive"}];
 
         // ============================================
         // GLOBAL VARIABLES
         // ============================================
-        let provider, signer, contract, userAddress, achievementNFT, lotteryContract, blackjackContract;
+        let provider, signer, contract, userAddress, achievementNFT, lotteryContract, blackjackContract, lotteryAchievementNFT, blackjackAchievementNFT;
         
         // DOM Elements
         const connectBtn = document.getElementById('connectBtn');
@@ -438,10 +442,14 @@
                     console.warn("⚠️ Please update BLACKJACK_ADDRESS after deploying");
                 }
                 // Create AchievementNFT contract instance
-                if (ACHIEVEMENT_NFT_ADDRESS === "YOUR_ACHIEVEMENT_NFT_CONTRACT_ADDRESS") {
-                    console.warn('Please update ACHIEVEMENT_NFT_ADDRESS with your deployed NFT contract address.');
-                } else {
+                if (ACHIEVEMENT_NFT_ADDRESS !== "YOUR_ADDRESS_HERE") {
                     achievementNFT = new ethers.Contract(ACHIEVEMENT_NFT_ADDRESS, ACHIEVEMENT_NFT_ABI, signer);
+                }
+                if (LOTTERY_ACHIEVEMENT_NFT_ADDRESS !== "YOUR_ADDRESS_HERE") {
+                    lotteryAchievementNFT = new ethers.Contract(LOTTERY_ACHIEVEMENT_NFT_ADDRESS, ACHIEVEMENT_NFT_ABI, signer);
+                }
+                if (BLACKJACK_ACHIEVEMENT_NFT_ADDRESS !== "YOUR_ADDRESS_HERE") {
+                    blackjackAchievementNFT = new ethers.Contract(BLACKJACK_ACHIEVEMENT_NFT_ADDRESS, ACHIEVEMENT_NFT_ABI, signer);
                 }
                 // Display address
                 userAddressSpan.innerText = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
@@ -503,44 +511,75 @@
                 setInterval(loadGameHistory, 15000);
                 setInterval(updateNFTStatus, 15000);
                 setInterval(updateBlackjackUI, 15000);
-                    // ============================================
-                    // UPDATE NFT STATUS
-                    // ============================================
-                    async function updateNFTStatus() {
-                        const nftStatusDiv = document.getElementById('nftStatus');
-                        if (!achievementNFT || !userAddress) {
-                            nftStatusDiv.style.display = 'none';
-                            return;
-                        }
-                        try {
-                            // Check if user has minted NFT
-                            const hasMinted = await achievementNFT.hasMinted(userAddress);
-                            if (hasMinted) {
-                                nftStatusDiv.innerHTML = '🏅 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Achievement NFT</span>!';
-                                nftStatusDiv.style.display = 'block';
-                                return;
-                            }
-                            // Count user wins from CoinFlip contract
-                            const gameIds = await contract.getPlayerGames(userAddress);
-                            let winCount = 0;
-                            for (let i = 0; i < gameIds.length; i++) {
-                                const game = await contract.getGame(gameIds[i]);
-                                if (game.won) winCount++;
-                            }
-                            const winsNeeded = Math.max(0, 10 - winCount);
-                            nftStatusDiv.innerHTML = winsNeeded === 0
-                                ? '🏅 <b>Eligible for NFT!</b> Please wait for your NFT to be minted.'
-                                : `🏆 Wins: <b>${winCount}</b> / 10 &mdash; <span style="color:#ffb300">${winsNeeded} more win${winsNeeded === 1 ? '' : 's'}</span> needed for NFT!`;
-                            nftStatusDiv.style.display = 'block';
-                        } catch (err) {
-                            nftStatusDiv.style.display = 'none';
-                        }
-                    }
+                await updateNFTStatus();
             } catch (error) {
                 console.error("Connection error:", error);
                 messageDiv.innerText = `❌ Connection failed: ${error.message}`;
             }
         };
+
+        // ============================================
+        // UPDATE NFT STATUS
+        // ============================================
+        async function updateNFTStatus() {
+            // CoinFlip NFT
+            const nftStatusDiv = document.getElementById('nftStatus');
+            if (achievementNFT && userAddress) {
+                try {
+                    const hasMinted = await achievementNFT.hasMinted(userAddress);
+                    if (hasMinted) {
+                        nftStatusDiv.innerHTML = '🏅 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">CoinFlip Achievement NFT</span>!';
+                        nftStatusDiv.style.display = 'block';
+                    } else {
+                        const gameIds = await contract.getPlayerGames(userAddress);
+                        let winCount = 0;
+                        for (let i = 0; i < gameIds.length; i++) {
+                            const game = await contract.getGame(gameIds[i]);
+                            if (game.won) winCount++;
+                        }
+                        const winsNeeded = Math.max(0, 10 - winCount);
+                        nftStatusDiv.innerHTML = winsNeeded === 0
+                            ? '🏅 <b>Eligible for NFT!</b> Please wait for your NFT to be minted.'
+                            : `🏆 CoinFlip Wins: <b>${winCount}</b> / 10 &mdash; <span style="color:#ffb300">${winsNeeded} more win${winsNeeded === 1 ? '' : 's'}</span> needed for NFT!`;
+                        nftStatusDiv.style.display = 'block';
+                    }
+                } catch (err) { nftStatusDiv.style.display = 'none'; }
+            }
+
+            // Lottery NFT
+            const lotStatusDiv = document.getElementById('nftStatus_lottery');
+            if (lotteryAchievementNFT && userAddress) {
+                try {
+                    const hasMinted = await lotteryAchievementNFT.hasMinted(userAddress);
+                    if (hasMinted) {
+                        lotStatusDiv.innerHTML = '🎟️ <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Lottery Jackpot NFT</span>!';
+                        lotStatusDiv.style.display = 'block';
+                    } else {
+                        lotStatusDiv.innerHTML = '🎟️ Win a Lottery Jackpot to earn an exclusive NFT!';
+                        lotStatusDiv.style.display = 'block';
+                    }
+                } catch (err) { lotStatusDiv.style.display = 'none'; }
+            }
+
+            // Blackjack NFT
+            const bjStatusDiv = document.getElementById('nftStatus_blackjack');
+            if (blackjackAchievementNFT && userAddress && blackjackContract) {
+                try {
+                    const hasMinted = await blackjackAchievementNFT.hasMinted(userAddress);
+                    if (hasMinted) {
+                        bjStatusDiv.innerHTML = '🃏 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Blackjack Master NFT</span>!';
+                        bjStatusDiv.style.display = 'block';
+                    } else {
+                        const bjWins = await blackjackContract.playerWins(userAddress);
+                        const winsNeeded = Math.max(0, 3 - Number(bjWins));
+                        bjStatusDiv.innerHTML = winsNeeded === 0
+                            ? '🃏 <b>Eligible for NFT!</b> Please wait for your NFT to be minted.'
+                            : `🏆 Blackjack Wins: <b>${bjWins}</b> / 3 &mdash; <span style="color:#ffb300">${winsNeeded} more win${winsNeeded === 1 ? '' : 's'}</span> needed for NFT!`;
+                        bjStatusDiv.style.display = 'block';
+                    }
+                } catch (err) { bjStatusDiv.style.display = 'none'; }
+            }
+        }
 
         // ============================================
         // PLAY GAME
@@ -630,9 +669,10 @@
             if (!lotteryContract) return;
             try {
                 showMessage('🎟️ Purchasing lottery ticket (0.05 ETH)... Please wait for confirmation.', 'info');
-                const tx = await lotteryContract.buyTicket({ value: ethers.parseEther("0.05") });
+                const tx = await lotteryContract.buyTicket({ value: ethers.parseEther("0.05"), gasLimit: 500000 });
                 await tx.wait();
                 await updateBalances();
+                await updateNFTStatus();
             } catch (error) {
                 console.error(error);
                 showMessage(`❌ Failed to buy ticket: ${error.message.substring(0, 50)}`, 'error');
