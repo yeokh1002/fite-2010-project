@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoinFlip Game - Decentralized Casino</title>
+    <title>Lucky Ledger - Decentralized Casino</title>
     <style>
         :root {
             --main-bg: #181c1f;
@@ -243,6 +243,24 @@
                 <button id="buyTicketBtn" class="connect-btn" style="margin-bottom: 1rem; background: linear-gradient(90deg, #ff4d6d, #f093fb);">Buy Ticket (0.05 ETH)</button>
                 <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 1rem;">🤖 Winner is drawn automatically when pool reaches 1 ETH (20 tickets).</div>
             </div>
+
+            <div class="game-controls" style="border-top: 1px solid #333; padding-top: 1.5rem; margin-top: 1.5rem;">
+                <h3 style="color: var(--accent); margin-bottom: 0.5rem">🃏 Blackjack Game</h3>
+                <label>🎲 Bet Amount (ETH)</label>
+                <input type="number" id="bjBetAmount" step="0.001" min="0.001" max="1" value="0.01">
+                
+                <div class="status" style="margin-bottom: 1rem;">
+                    <div>🧑 Your Hand: <span id="bjPlayerHand">?</span> (Total: <span id="bjPlayerTotal">0</span>)</div>
+                    <div>🤖 Dealer Hand: <span id="bjDealerHand">?</span> (Total: <span id="bjDealerTotal">0</span>)</div>
+                    <div style="margin-top: 5px; font-weight: bold;" id="bjGameStatus">Status: Waiting to start...</div>
+                </div>
+
+                <div class="guess-buttons">
+                    <button id="bjStartBtn" class="guess-btn" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: #181c1f;">🃏 Start Game</button>
+                    <button id="bjHitBtn" class="guess-btn" disabled style="background: linear-gradient(135deg, #fa709a, #fee140); color: #181c1f;">➕ Hit</button>
+                    <button id="bjStandBtn" class="guess-btn" disabled style="background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #181c1f;">🛑 Stand</button>
+                </div>
+            </div>
             
             <div id="message" class="status" style="display: none;"></div>
             
@@ -266,7 +284,7 @@
         // CONFIGURATION - UPDATE AFTER DEPLOYMENT
         // ============================================
         // Replace with your deployed contract address!
-        const CONTRACT_ADDRESS = "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE";
+        const CONTRACT_ADDRESS = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"; // ← UPDATE THIS!
         
         // Complete ABI for CoinFlip.sol
         // Paste your CoinFlip ABI below for frontend use
@@ -356,10 +374,13 @@
             {"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}
         ];
 
+        const BLACKJACK_ADDRESS = "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"; // update upon deploy
+        const BLACKJACK_ABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"bet","type":"uint256"}],"name":"GameStarted","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint8","name":"card","type":"uint8"}],"name":"Hit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"gameId","type":"uint256"},{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint8[]","name":"dealerCards","type":"uint8[]"},{"indexed":false,"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"}],"name":"Stand","type":"event"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"activeGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"games","outputs":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getDealerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"gameId","type":"uint256"}],"name":"getGame","outputs":[{"components":[{"internalType":"uint256","name":"gameId","type":"uint256"},{"internalType":"address","name":"player","type":"address"},{"internalType":"uint256","name":"betAmount","type":"uint256"},{"internalType":"uint8[]","name":"playerHand","type":"uint8[]"},{"internalType":"uint8[]","name":"dealerHand","type":"uint8[]"},{"internalType":"enum Blackjack.GameStatus","name":"status","type":"uint8"},{"internalType":"uint256","name":"timestamp","type":"uint256"}],"internalType":"struct Blackjack.Game","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8[]","name":"hand","type":"uint8[]"}],"name":"getHandTotal","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerGames","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getPlayerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"player","type":"address"}],"name":"getStatus","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"hit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"nextGameId","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"playerGames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"stand","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startGame","outputs":[],"stateMutability":"payable","type":"function"},{"stateMutability":"payable","type":"receive"}];
+
         // ============================================
         // GLOBAL VARIABLES
         // ============================================
-        let provider, signer, contract, userAddress, achievementNFT, lotteryContract;
+        let provider, signer, contract, userAddress, achievementNFT, lotteryContract, blackjackContract;
         
         // DOM Elements
         const connectBtn = document.getElementById('connectBtn');
@@ -377,6 +398,17 @@
         const ticketsSoldSpan = document.getElementById('ticketsSold');
         const currentPoolSpan = document.getElementById('currentPool');
         const buyTicketBtn = document.getElementById('buyTicketBtn');
+        
+        // Blackjack Elements
+        const bjBetAmountInput = document.getElementById('bjBetAmount');
+        const bjStartBtn = document.getElementById('bjStartBtn');
+        const bjHitBtn = document.getElementById('bjHitBtn');
+        const bjStandBtn = document.getElementById('bjStandBtn');
+        const bjPlayerHandSpan = document.getElementById('bjPlayerHand');
+        const bjDealerHandSpan = document.getElementById('bjDealerHand');
+        const bjPlayerTotalSpan = document.getElementById('bjPlayerTotal');
+        const bjDealerTotalSpan = document.getElementById('bjDealerTotal');
+        const bjGameStatusDiv = document.getElementById('bjGameStatus');
 
         // ============================================
         // CONNECT WALLET
@@ -400,6 +432,11 @@
                 }
                 contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                 lotteryContract = new ethers.Contract(LOTTERY_ADDRESS, LOTTERY_ABI, signer);
+                if (BLACKJACK_ADDRESS && BLACKJACK_ADDRESS !== "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0") {
+                    blackjackContract = new ethers.Contract(BLACKJACK_ADDRESS, BLACKJACK_ABI, signer);
+                } else {
+                    console.warn("⚠️ Please update BLACKJACK_ADDRESS after deploying");
+                }
                 // Create AchievementNFT contract instance
                 if (ACHIEVEMENT_NFT_ADDRESS === "YOUR_ACHIEVEMENT_NFT_CONTRACT_ADDRESS") {
                     console.warn('Please update ACHIEVEMENT_NFT_ADDRESS with your deployed NFT contract address.');
@@ -411,6 +448,7 @@
                 await updateBalances();
                 await loadGameHistory();
                 await updateNFTStatus();
+                if(blackjackContract) await updateBlackjackUI();
                 // Listen for GameResult events
                 contract.on("GameResult", async (gameId, result, won, payout) => {
                     const resultText = won ? '🎉 WINNER!' : '😢 LOST!';
@@ -436,6 +474,27 @@
                     await updateBalances();
                 });
 
+                if (blackjackContract) {
+                    blackjackContract.on("GameStarted", async (gameId, player, bet) => {
+                        if (player === userAddress) {
+                            await updateBlackjackUI();
+                        }
+                    });
+                    blackjackContract.on("Hit", async (gameId, player, card) => {
+                        if (player === userAddress) {
+                            await updateBlackjackUI();
+                        }
+                    });
+                    blackjackContract.on("Stand", async (gameId, player, dealerCards, status) => {
+                        if (player === userAddress) {
+                            await updateBlackjackUI();
+                            let resultStr = status == 2 ? "🎉 You WON!" : status == 3 ? "😢 You LOST!" : "🤝 TIE!";
+                            showMessage(`🃏 Blackjack Resolved: ${resultStr}`, status == 2 ? 'success' : 'error');
+                            await loadGameHistory();
+                        }
+                    });
+                }
+
                 walletInfo.style.display = "block";
                 connectBtn.style.display = "none";
                 messageDiv.style.display = "none";
@@ -443,6 +502,7 @@
                 setInterval(updateBalances, 10000);
                 setInterval(loadGameHistory, 15000);
                 setInterval(updateNFTStatus, 15000);
+                setInterval(updateBlackjackUI, 15000);
                     // ============================================
                     // UPDATE NFT STATUS
                     // ============================================
@@ -580,44 +640,192 @@
         };
 
         // ============================================
+        // BLACKJACK FUNCTIONS
+        // ============================================
+        function convertCard(card) {
+            if(card == 1) return "A";
+            if(card == 11) return "J";
+            if(card == 12) return "Q";
+            if(card == 13) return "K";
+            return card.toString();
+        }
+
+        async function updateBlackjackUI() {
+            if (!blackjackContract) return;
+            try {
+                const statusNum = await blackjackContract.getStatus(userAddress); // 0=None, 1=Active, 2=Won, 3=Lost, 4=Tie
+                
+                const pHand = await blackjackContract.getPlayerHand(userAddress);
+                const dHand = await blackjackContract.getDealerHand(userAddress);
+                
+                // Convert Result proxy objects to standard arrays to prevent ethers v6 encoding crashes
+                const pTotal = await blackjackContract.getHandTotal([...pHand]);
+                const dTotal = await blackjackContract.getHandTotal([...dHand]);
+                
+                bjPlayerHandSpan.innerText = pHand.map(c => convertCard(c)).join(", ") || "?";
+                bjDealerHandSpan.innerText = dHand.map(c => convertCard(c)).join(", ") || "?";
+                bjPlayerTotalSpan.innerText = pTotal.toString();
+                bjDealerTotalSpan.innerText = dTotal.toString();
+
+                if (statusNum == 0 && pHand.length == 0) {
+                    bjGameStatusDiv.innerText = "Status: Waiting to start...";
+                    bjGameStatusDiv.style.color = "var(--text)";
+                    bjStartBtn.disabled = false;
+                    bjHitBtn.disabled = true;
+                    bjStandBtn.disabled = true;
+                } else if (statusNum == 1) {
+                    bjGameStatusDiv.innerText = "Status: Game Active - Your Turn!";
+                    bjGameStatusDiv.style.color = "var(--accent)";
+                    bjStartBtn.disabled = true;
+                    bjHitBtn.disabled = false;
+                    bjStandBtn.disabled = false;
+                } else {
+                    let resultMsg = "";
+                    if (statusNum == 2) { resultMsg = "🎉 You WON!"; bjGameStatusDiv.style.color = "#4caf50"; }
+                    if (statusNum == 3) { resultMsg = "💀 You LOST!"; bjGameStatusDiv.style.color = "#ff4d6d"; }
+                    if (statusNum == 4) { resultMsg = "🤝 TIE!"; bjGameStatusDiv.style.color = "var(--text)"; }
+                    bjGameStatusDiv.innerText = `Status: Ended - ${resultMsg}`;
+                    bjStartBtn.disabled = false;
+                    bjHitBtn.disabled = true;
+                    bjStandBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error("Blackjack UI update error:", error);
+            }
+        }
+
+        bjStartBtn.onclick = async () => {
+            if (!blackjackContract) return;
+            const betAmount = bjBetAmountInput.value;
+            if (!betAmount || betAmount <= 0) return;
+            try {
+                showMessage(`🃏 Starting Blackjack with ${betAmount} ETH...`, 'info');
+                // Added a specific safe gasLimit to prevent hardhat local estimation issues on pseudo-random starts
+                const tx = await blackjackContract.startGame({ value: ethers.parseEther(betAmount), gasLimit: 500000 });
+                await tx.wait();
+                await updateBalances();
+                await updateBlackjackUI();
+            } catch (error) {
+                console.error(error);
+                showMessage(`❌ Failed to start game: ${error.message.substring(0, 50)}`, 'error');
+            }
+        };
+
+        bjHitBtn.onclick = async () => {
+            if (!blackjackContract) return;
+            try {
+                showMessage(`➕ Hitting...`, 'info');
+                const tx = await blackjackContract.hit({ gasLimit: 300000 });
+                await tx.wait();
+                await updateBalances();
+                await updateBlackjackUI();
+            } catch (error) {
+                console.error(error);
+                showMessage(`❌ Hit failed: ${error.message.substring(0, 50)}`, 'error');
+            }
+        };
+
+        bjStandBtn.onclick = async () => {
+            if (!blackjackContract) return;
+            try {
+                showMessage(`🛑 Standing... Dealer's turn.`, 'info');
+                const tx = await blackjackContract.stand({ gasLimit: 500000 });
+                await tx.wait();
+                await updateBalances();
+                await updateBlackjackUI();
+            } catch (error) {
+                console.error(error);
+                showMessage(`❌ Stand failed: ${error.message.substring(0, 50)}`, 'error');
+            }
+        };
+
+        // ============================================
         // LOAD GAME HISTORY
         // ============================================
         async function loadGameHistory() {
-            if (!contract || !userAddress) return;
+            if (!userAddress) return;
             
             historyBody.innerHTML = '<tr><td colspan="6">Loading history...</td></tr>';
             
             try {
-                const gameIds = await contract.getPlayerGames(userAddress);
+                let allGames = [];
+
+                // 1. Fetch CoinFlip Games
+                if (contract) {
+                    const cfIds = await contract.getPlayerGames(userAddress);
+                    const recentCf = cfIds.slice(-10); // get last 10
+                    for (let i = 0; i < recentCf.length; i++) {
+                        const game = await contract.getGame(recentCf[i]);
+                        allGames.push({
+                            type: 'CoinFlip',
+                            id: "CF-" + game.gameId.toString(),
+                            bet: ethers.formatEther(game.betAmount),
+                            guess: game.guess == 0 ? '🪙 Heads' : '🪙 Tails',
+                            resultText: game.result == 2 ? '⏳ Pending' : (game.result == 0 ? '🪙 Heads' : '🪙 Tails'),
+                            statusNum: Number(game.status), // 0 Open, 1 Completed, 2 Cancelled
+                            statusText: Number(game.status) === 0 ? '🟡 Open' : (Number(game.status) === 1 ? '✅ Completed' : '❌ Cancelled'),
+                            won: game.won,
+                            outcomeText: Number(game.status) === 0 ? '---' : (game.won ? '🏆 WON' : '💀 LOST'),
+                            outcomeClass: Number(game.status) === 0 ? '' : (game.won ? 'won' : 'lost'),
+                            timestamp: Number(game.timestamp)
+                        });
+                    }
+                }
+
+                // 2. Fetch Blackjack Games
+                if (blackjackContract) {
+                    const bjIds = await blackjackContract.getPlayerGames(userAddress);
+                    const recentBj = bjIds.slice(-10);
+                    for (let i = 0; i < recentBj.length; i++) {
+                        const game = await blackjackContract.getGame(recentBj[i]);
+                        const pTotal = await blackjackContract.getHandTotal([...game.playerHand]);
+                        const dTotal = await blackjackContract.getHandTotal([...game.dealerHand]);
+                        
+                        const statusNum = Number(game.status); // 0=None, 1=Active, 2=Won, 3=Lost, 4=Tie
+                        const statusStr = statusNum === 1 ? '🟡 Active' : '✅ Finished';
+                        const outcomeText = statusNum === 2 ? '🏆 WON' : (statusNum === 3 ? '💀 LOST' : (statusNum === 4 ? '🤝 TIE' : '---'));
+                        const outcomeClass = statusNum === 2 ? 'won' : (statusNum === 3 ? 'lost' : '');
+                        
+                        allGames.push({
+                            type: 'Blackjack',
+                            id: "BJ-" + game.gameId.toString(),
+                            bet: ethers.formatEther(game.betAmount),
+                            guess: `Cards: ${pTotal}`,
+                            resultText: `Dealer: ${dTotal}`,
+                            statusNum: statusNum,
+                            statusText: statusStr,
+                            won: statusNum === 2,
+                            outcomeText: outcomeText,
+                            outcomeClass: outcomeClass,
+                            timestamp: Number(game.timestamp)
+                        });
+                    }
+                }
                 
-                if (gameIds.length === 0) {
+                if (allGames.length === 0) {
                     historyBody.innerHTML = '<tr><td colspan="6">No games played yet</td></tr>';
                     return;
                 }
                 
+                // Sort by timestamp descending
+                allGames.sort((a, b) => b.timestamp - a.timestamp);
+                
                 historyBody.innerHTML = '';
                 
-                // Load last 10 games only (for performance)
-                const recentGames = gameIds.slice(-10);
+                // Show last 15 combined games
+                const recentGames = allGames.slice(0, 15);
                 
-                for (let i = recentGames.length - 1; i >= 0; i--) {
-                    const gameId = recentGames[i];
-                    const game = await contract.getGame(gameId);
-                    
-                    const statusText = ['🟡 Open', '✅ Completed', '❌ Cancelled'][game.status];
-                    const outcomeText = game.won ? '🏆 WON' : '💀 LOST';
-                    const outcomeClass = game.won ? 'won' : 'lost';
-                    const resultText = game.result == 2 ? '⏳ Pending' : (game.result == 0 ? '🪙 Heads' : '🪙 Tails');
-                    const guessText = game.guess == 0 ? '🪙 Heads' : '🪙 Tails';
+                for (let i = 0; i < recentGames.length; i++) {
+                    const g = recentGames[i];
                     
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${game.gameId.toString()}</td>
-                        <td>${ethers.formatEther(game.betAmount)}</td>
-                        <td>${guessText}</td>
-                        <td>${resultText}</td>
-                        <td>${statusText}</td>
-                        <td class="${outcomeClass}">${outcomeText}</td>
+                        <td>${g.id}</td>
+                        <td>${g.bet}</td>
+                        <td>${g.guess}</td>
+                        <td>${g.resultText}</td>
+                        <td>${g.statusText}</td>
+                        <td class="${g.outcomeClass}">${g.outcomeText}</td>
                     `;
                     historyBody.appendChild(row);
                 }

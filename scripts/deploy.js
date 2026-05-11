@@ -50,12 +50,27 @@ async function main() {
   await ltTx.wait();
   console.log("✅ LotteryTicket minting rights given to Lottery contract");
 
-  // 6) Print frontend values
+  // 6) Deploy and fund Blackjack
+  const Blackjack = await hre.ethers.getContractFactory("Blackjack");
+  const blackjack = await Blackjack.deploy();
+  await blackjack.waitForDeployment();
+  const blackjackAddress = await blackjack.getAddress();
+  console.log(`✅ Blackjack game deployed to: ${blackjackAddress}`);
+
+  const fundBjTx = await deployer.sendTransaction({
+    to: blackjackAddress,
+    value: hre.ethers.parseEther("10"),
+  });
+  await fundBjTx.wait();
+  console.log("✅ Blackjack funded with 10 ETH");
+
+  // 7) Print frontend values
   console.log("\n📝 Frontend config:");
   console.log(`CONTRACT_ADDRESS = "${coinFlipAddress}"`);
   console.log(`ACHIEVEMENT_NFT_ADDRESS = "${achievementNFTAddress}"`);
   console.log(`LOTTERY_ADDRESS = "${lotteryAddress}"`);
   console.log(`LOTTERY_TICKET_ADDRESS = "${lotteryTicketAddress}"`);
+  console.log(`BLACKJACK_ADDRESS = "${blackjackAddress}"`);
 }
 
 main().catch((error) => {
