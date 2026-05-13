@@ -4,278 +4,415 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucky Ledger - Decentralized Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --main-bg: #181c1f;
-            --accent: #ffb300;
-            --accent2: #00e0d3;
-            --surface: #23272a;
-            --text: #f3f3f3;
-            --muted: #8a8f98;
-            --danger: #ff4d6d;
-            --radius: 18px;
-            --shadow: 0 8px 32px rgba(0,0,0,0.25);
-            --font-main: 'JetBrains Mono', monospace;
-            --font-head: 'Bebas Neue', sans-serif;
+            --bg-base: #05050A;
+            --bg-glass: rgba(15, 15, 25, 0.65);
+            --neon-pink: #FF0055;
+            --neon-blue: #00F3FF;
+            --neon-yellow: #FFCF00;
+            --text-main: #E0E6ED;
+            --text-muted: #8B949E;
+            --font-head: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+            --border-radius: 12px;
+            --border-light: rgba(0, 243, 255, 0.15);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(255, 0, 85, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 243, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(255, 207, 0, 0.05) 0%, transparent 50%),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px;
             min-height: 100vh;
-            background: repeating-linear-gradient(135deg, var(--main-bg) 0 40px, #23272a 40px 80px);
+            color: var(--text-main);
+            font-family: var(--font-body);
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-family: var(--font-main);
-            color: var(--text);
-            padding: 20px;
+            align-items: flex-start;
+            padding: 4rem 1rem;
+            overflow-x: hidden;
+            position: relative;
         }
-        
+
+        ::selection { background: var(--neon-blue); color: var(--bg-base); }
+
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        body::before { background: var(--neon-blue); top: -100px; left: -100px; }
+        body::after { background: var(--neon-pink); bottom: -100px; right: -100px; animation-delay: -10s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 100px) scale(1.2); }
+            100% { transform: translate(-50px, 50px) scale(0.9); }
+        }
+
         .container {
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 2rem;
-            max-width: 600px;
+            max-width: 680px;
             width: 100%;
-            animation: fadein 0.8s ease-out;
+            position: relative;
+            z-index: 10;
         }
-        
-        @keyframes fadein {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+
         h1 {
             font-family: var(--font-head);
-            font-size: 2.5rem;
-            color: var(--accent);
+            font-size: 4rem;
             text-align: center;
-            margin-bottom: 1rem;
-            letter-spacing: 2px;
+            margin-bottom: 3rem;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--neon-blue);
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: glitch-load 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
         }
-        
-        .connect-btn {
-            background: linear-gradient(90deg, var(--accent), var(--accent2));
-            color: #181c1f;
+
+        @keyframes glitch-load {
+            0% { transform: translateY(-50px) scale(0.9); opacity: 0; filter: blur(10px); }
+            50% { filter: blur(0px) hue-rotate(90deg); }
+            100% { transform: translateY(0) scale(1); filter: hue-rotate(0); opacity: 1; }
+        }
+
+        h1 span {
+            color: var(--neon-pink);
+            -webkit-text-stroke: 0;
+            text-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+        }
+
+        .card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.02);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fade-up 0.8s forwards;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 243, 255, 0.4);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .card-delay-1 { animation-delay: 0.1s; }
+        .card-delay-2 { animation-delay: 0.2s; }
+        .card-delay-3 { animation-delay: 0.3s; }
+        .card-delay-4 { animation-delay: 0.4s; }
+
+        @keyframes fade-up {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h3 {
             font-family: var(--font-head);
-            font-size: 1.2rem;
-            border: none;
-            border-radius: var(--radius);
-            padding: 0.8rem 1.5rem;
-            width: 100%;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.2s, filter 0.2s;
+            font-size: 1.6rem;
+            color: var(--neon-yellow);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
         }
-        
-        .connect-btn:hover {
-            transform: scale(1.02);
-            filter: brightness(1.1);
+
+        .status-box {
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            border-left: 3px solid var(--neon-blue);
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            position: relative;
         }
-        
-        .status {
-            background: #1a1d21;
-            padding: 1rem;
-            border-radius: var(--radius);
-            margin: 1rem 0;
-            border-left: 3px solid var(--accent2);
-            font-size: 0.9rem;
-            word-break: break-all;
-        }
-        
-        .game-controls {
-            margin: 1.5rem 0;
-        }
-        
+        .status-box div { margin-bottom: 0.5rem; }
+        .status-box div:last-child { margin-bottom: 0; }
+        .status-box span { color: var(--neon-blue); text-shadow: 0 0 5px rgba(0, 243, 255, 0.5); }
+
+        .nft-alert { background: rgba(255, 207, 0, 0.1); border-left-color: var(--neon-yellow); }
+        .nft-alert span { color: var(--neon-yellow); text-shadow: 0 0 5px rgba(255, 207, 0, 0.4); font-family: var(--font-body); font-weight: 700; }
+
         label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--accent2);
-            font-weight: bold;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            text-transform: uppercase;
         }
-        
-        input, select {
+
+        input {
             width: 100%;
-            padding: 0.8rem;
-            border-radius: 12px;
-            border: 1px solid var(--accent2);
-            background: #1a1d21;
-            color: var(--text);
-            margin-bottom: 1rem;
-            font-family: var(--font-main);
-        }
-        
-        .guess-buttons {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        
-        .guess-btn {
-            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
             padding: 1rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
             font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: transform 0.2s;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
         }
-        
-        .guess-btn:hover {
-            transform: scale(1.02);
+
+        input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            background: rgba(0, 243, 255, 0.05);
         }
-        
-        #headsBtn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        
-        #tailsBtn {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            color: white;
-        }
-        
-        .history {
-            margin-top: 2rem;
-            background: #1a1d21;
-            border-radius: var(--radius);
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn-triple { grid-template-columns: 1fr 1fr 1fr; }
+
+        button {
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
             padding: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
+            font-family: var(--font-head);
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 8px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+            z-index: 1;
         }
-        
-        .history h3 {
-            color: var(--accent);
-            margin-bottom: 1rem;
-            text-align: center;
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--btn-color, rgba(255,255,255,0.1));
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        
+
+        button:hover {
+            border-color: var(--btn-color, white);
+            color: white;
+            text-shadow: 0 0 8px rgba(255,255,255,0.5);
+            box-shadow: 0 0 20px var(--btn-glow, transparent);
+            transform: translateY(-2px);
+        }
+        button:hover::before { transform: scaleX(1); }
+        button:active { transform: translateY(1px); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+
+        #connectBtn {
+            --btn-color: var(--neon-blue);
+            --btn-glow: rgba(0, 243, 255, 0.3);
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+            width: 100%;
+            margin-bottom: 2rem;
+            animation: pulse-border 2s infinite alternate;
+            font-size: 1.3rem;
+            padding: 1.2rem;
+        }
+
+        @keyframes pulse-border {
+            from { box-shadow: 0 0 5px rgba(0, 243, 255, 0.2), inset 0 0 5px rgba(0, 243, 255, 0.1); }
+            to { box-shadow: 0 0 15px rgba(0, 243, 255, 0.6), inset 0 0 10px rgba(0, 243, 255, 0.2); }
+        }
+
+        #headsBtn, #bjHitBtn {
+            --btn-color: var(--neon-pink);
+            --btn-glow: rgba(255, 0, 85, 0.4);
+            border-color: rgba(255, 0, 85, 0.3);
+            color: var(--neon-pink);
+        }
+
+        #tailsBtn, #bjStandBtn {
+            --btn-color: var(--neon-blue);
+            --btn-glow: rgba(0, 243, 255, 0.4);
+            border-color: rgba(0, 243, 255, 0.3);
+            color: var(--neon-blue);
+        }
+
+        #buyTicketBtn {
+            --btn-color: var(--neon-yellow);
+            --btn-glow: rgba(255, 207, 0, 0.4);
+            border-color: rgba(255, 207, 0, 0.3);
+            color: var(--neon-yellow);
+            width: 100%;
+        }
+
+        #bjStartBtn {
+            --btn-color: #00FF88;
+            --btn-glow: rgba(0, 255, 136, 0.4);
+            border-color: rgba(0, 255, 136, 0.3);
+            color: #00FF88;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
         }
-        
-        th, td {
-            padding: 0.5rem;
+        th { background: rgba(0, 243, 255, 0.1); color: var(--neon-blue); padding: 1rem 0.5rem; text-align: left; border-bottom: 2px solid rgba(0, 243, 255, 0.2); }
+        td { padding: 1rem 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        tr:hover td { background: rgba(255,255,255,0.04); }
+
+        .won { color: #00FF88; text-shadow: 0 0 5px rgba(0, 255, 136, 0.5); font-weight: bold; }
+        .lost { color: var(--neon-pink); text-shadow: 0 0 5px rgba(255, 0, 85, 0.5); }
+        .pending { color: var(--neon-yellow); text-shadow: 0 0 5px rgba(255, 207, 0, 0.5); }
+
+        .helper-text { text-align: center; font-family: var(--font-mono); color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem; opacity: 0.8; }
+
+        #message {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
             text-align: center;
-            border-bottom: 1px solid #2a2d31;
+            border-left: none;
+            border-top: 2px solid transparent;
+            animation: message-in 0.3s ease-out forwards;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
         }
-        
-        th {
-            background: #23272a;
-            color: var(--accent2);
-        }
-        
-        .won {
-            color: #4caf50;
-            font-weight: bold;
-        }
-        
-        .lost {
-            color: #f44336;
-        }
-        
-        .pending {
-            color: var(--accent);
-        }
-        
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
+        @keyframes message-in { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .cyber-dots { position: absolute; top: 20px; right: 20px; display: flex; gap: 4px; opacity: 0.5; }
+        .cyber-dots span { width: 4px; height: 4px; background: var(--neon-blue); border-radius: 50%; }
+
         @media (max-width: 600px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .guess-btn {
-                padding: 0.7rem;
-                font-size: 1rem;
-            }
+            h1 { font-size: 2.5rem; }
+            .card { padding: 1.5rem; }
+            .btn-grid, .btn-triple { grid-template-columns: 1fr; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🪙 Lucky Ledger</h1>
+        <h1>Lucky <span>Ledger</span></h1>
         
-        <button class="connect-btn" id="connectBtn">🔌 Connect Wallet</button>
+        <button id="connectBtn">[ INITIALIZE_UPLINK ]</button>
         
         <div id="walletInfo" style="display: none;">
-            <div class="status">
-                <div>📍 Address: <span id="userAddress">-</span></div>
-                <div>💰 Your Balance: <span id="userBalance">0</span> ETH</div>
-                <div>🏦 Contract Balance: <span id="contractBalance">0</span> ETH</div>
-            </div>
-            <div class="status" id="nftStatus" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
             
-            <div class="game-controls">
-                <h3 style="color: var(--accent); margin-bottom: 0.5rem">🪙 CoinFlip Game</h3>
-                <label>🎲 Bet Amount (ETH)</label>
+            <div class="card card-delay-1">
+                <div class="cyber-dots"><span></span><span></span><span></span></div>
+                <h3>SYSTEM_PROFILE</h3>
+                <div class="status-box">
+                    <div>USER_HSH: <span id="userAddress">----</span></div>
+                    <div>WALLET_CAP: <span id="userBalance">0.00</span> ETH</div>
+                    <div>CNTR_VAULT: <span id="contractBalance">0.00</span> ETH</div>
+                </div>
+            </div>
+
+            <div class="card card-delay-2">
+                <h3>[1] COIN_FLIP</h3>
+                <div class="status-box nft-alert" id="nftStatus" style="display: none;"></div>
+                
+                <label>INJECT_WAGER (ETH)</label>
                 <input type="number" id="betAmount" step="0.001" min="0.001" max="1" value="0.01">
                 
-                <label>🔮 Choose Side</label>
-                <div class="guess-buttons">
-                    <button id="headsBtn" class="guess-btn">🪙 HEADS</button>
-                    <button id="tailsBtn" class="guess-btn">🪙 TAILS</button>
+                <label>EXECUTE_DECISION</label>
+                <div class="btn-grid">
+                    <button class="guess-btn" id="headsBtn">[0] HEADS</button>
+                    <button class="guess-btn" id="tailsBtn">[1] TAILS</button>
                 </div>
             </div>
 
-            <div class="status" id="nftStatus_lottery" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
-            <div class="game-controls" style="border-top: 1px solid #333; padding-top: 1.5rem; margin-top: 1.5rem;">
-                <h3 style="color: var(--accent); margin-bottom: 0.5rem">🎟️ Lottery Game</h3>
-                <div class="status" style="margin-bottom: 1rem;">
-                    <div>🎫 Tickets Sold This Round: <span id="ticketsSold">0</span> / 20</div>
-                    <div>🏆 Current Prize Pool: <span id="currentPool">0</span> / 1.0 ETH</div>
+            <div class="card card-delay-3">
+                <h3>[2] LOTTERY_MATRIX</h3>
+                <div class="status-box nft-alert" id="nftStatus_lottery" style="display: none;"></div>
+                <div class="status-box">
+                    <div>TICKETS_ACQ: <span id="ticketsSold">0</span> / 20</div>
+                    <div>PRIZE_ACCUM: <span id="currentPool">0.00</span> / 1.0 ETH</div>
                 </div>
-                <button id="buyTicketBtn" class="connect-btn" style="margin-bottom: 1rem; background: linear-gradient(90deg, #ff4d6d, #f093fb);">Buy Ticket (0.05 ETH)</button>
-                <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 1rem;">🤖 Winner is drawn automatically when pool reaches 1 ETH (20 tickets).</div>
+                <button id="buyTicketBtn" class="connect-btn">MINT_TICKET (0.05 ETH)</button>
+                <div class="helper-text">// Autonomous execution upon 1.0 ETH threshold //</div>
             </div>
 
-            <div class="status" id="nftStatus_blackjack" style="background: #23272a; border-left: 3px solid #ffb300; margin-bottom: 1rem; display: none;"></div>
-            <div class="game-controls" style="border-top: 1px solid #333; padding-top: 1.5rem; margin-top: 1.5rem;">
-                <h3 style="color: var(--accent); margin-bottom: 0.5rem">🃏 Blackjack Game</h3>
-                <label>🎲 Bet Amount (ETH)</label>
+            <div class="card card-delay-4">
+                <h3>[3] BLACKJACK_ENGINE</h3>
+                <div class="status-box nft-alert" id="nftStatus_blackjack" style="display: none;"></div>
+                
+                <label>INJECT_WAGER (ETH)</label>
                 <input type="number" id="bjBetAmount" step="0.001" min="0.001" max="1" value="0.01">
                 
-                <div class="status" style="margin-bottom: 1rem;">
-                    <div>🧑 Your Hand: <span id="bjPlayerHand">?</span> (Total: <span id="bjPlayerTotal">0</span>)</div>
-                    <div>🤖 Dealer Hand: <span id="bjDealerHand">?</span> (Total: <span id="bjDealerTotal">0</span>)</div>
-                    <div style="margin-top: 5px; font-weight: bold;" id="bjGameStatus">Status: Waiting to start...</div>
+                <div class="status-box">
+                    <div>USER_ARR: <span id="bjPlayerHand">_</span> [SIG: <span id="bjPlayerTotal">0</span>]</div>
+                    <div>HOST_ARR: <span id="bjDealerHand">_</span> [SIG: <span id="bjDealerTotal">0</span>]</div>
+                    <div id="bjGameStatus" style="margin-top: 10px; border-top: 1px dashed rgba(0,243,255,0.3); padding-top: 10px;">STATE: STANDBY...</div>
                 </div>
 
-                <div class="guess-buttons">
-                    <button id="bjStartBtn" class="guess-btn" style="background: linear-gradient(135deg, #43e97b, #38f9d7); color: #181c1f;">🃏 Start Game</button>
-                    <button id="bjHitBtn" class="guess-btn" disabled style="background: linear-gradient(135deg, #fa709a, #fee140); color: #181c1f;">➕ Hit</button>
-                    <button id="bjStandBtn" class="guess-btn" disabled style="background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #181c1f;">🛑 Stand</button>
+                <div class="btn-grid btn-triple">
+                    <button id="bjStartBtn" class="guess-btn">INIT_SEQ</button>
+                    <button id="bjHitBtn" class="guess-btn" disabled>HIT_NODE</button>
+                    <button id="bjStandBtn" class="guess-btn" disabled>HALT_SEQ</button>
                 </div>
             </div>
             
             <div id="message" class="status" style="display: none;"></div>
             
-            <div class="history">
-                <h3>📜 Game History</h3>
-                <table id="historyTable">
-                    <thead>
-                        <tr><th>ID</th><th>Bet (ETH)</th><th>Your Guess</th><th>Result</th><th>Status</th><th>Outcome</th></tr>
-                    </thead>
-                    <tbody id="historyBody">
-                        <tr><td colspan="6">Connect wallet to see history</td></tr>
-                    </tbody>
-                </table>
+            <div class="card card-delay-4" style="animation-delay: 0.5s;">
+                <h3>TRANSACTION_LOG</h3>
+                <div class="history">
+                    <table id="historyTable">
+                        <thead>
+                            <tr><th>HASH</th><th>WAGER</th><th>GUESS</th><th>RES</th><th>STATE</th><th>YIELD</th></tr>
+                        </thead>
+                        <tbody id="historyBody">
+                            <tr><td colspan="6" style="text-align:center;">Awaiting uplink...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -528,7 +665,7 @@
                 try {
                     const hasMinted = await achievementNFT.hasMinted(userAddress);
                     if (hasMinted) {
-                        nftStatusDiv.innerHTML = '🏅 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">CoinFlip Achievement NFT</span>!';
+                        nftStatusDiv.innerHTML = '🏅 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Lucky Cat NFT</span>!';
                         nftStatusDiv.style.display = 'block';
                     } else {
                         const gameIds = await contract.getPlayerGames(userAddress);
@@ -552,7 +689,7 @@
                 try {
                     const hasMinted = await lotteryAchievementNFT.hasMinted(userAddress);
                     if (hasMinted) {
-                        lotStatusDiv.innerHTML = '🎟️ <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Lottery Jackpot NFT</span>!';
+                        lotStatusDiv.innerHTML = '🎟️ <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Lucky Calf NFT</span>!';
                         lotStatusDiv.style.display = 'block';
                     } else {
                         lotStatusDiv.innerHTML = '🎟️ Win a Lottery Jackpot to earn an exclusive NFT!';
@@ -567,7 +704,7 @@
                 try {
                     const hasMinted = await blackjackAchievementNFT.hasMinted(userAddress);
                     if (hasMinted) {
-                        bjStatusDiv.innerHTML = '🃏 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Blackjack Master NFT</span>!';
+                        bjStatusDiv.innerHTML = '🃏 <b>Congratulations!</b> You have earned the <span style="color:#ffb300">Lucky Lamb NFT</span>!';
                         bjStatusDiv.style.display = 'block';
                     } else {
                         const bjWins = await blackjackContract.playerWins(userAddress);
