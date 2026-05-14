@@ -1,5 +1,6 @@
 
 # Lucky Ledger
+
 ## FITE2010 Group Project
 
 A decentralized gaming platform built with Hardhat, featuring smart contracts for Blackjack, Coin Flip, and Lottery games, with NFT-based achievements and a simple web frontend.
@@ -9,57 +10,65 @@ A decentralized gaming platform built with Hardhat, featuring smart contracts fo
 - **Blackjack, Coin Flip, and Lottery games** implemented as smart contracts in Solidity.
 - **NFT Achievements**: Earn NFTs for in-game accomplishments.
 - **Lottery Ticket NFTs**: Each lottery entry is an NFT.
-- **Frontend**: Simple HTML/JS interface for interacting with the contracts.
+- **Frontend**: Simple HTML interface for interacting with the contracts.
 - **Security**: Includes a custom ReentrancyGuard and uses OpenZeppelin contracts.
 
 ## Project Structure
 
 ```
-contracts/         # Solidity smart contracts
-  AchievementNFT.sol
-  Blackjack.sol
-  BlackjackAchievementNFT.sol
-  CoinFlip.sol
-  Lottery.sol
-  LotteryAchievementNFT.sol
-  LotteryTicket.sol
-  security/
-	 ReentrancyGuard.sol
+contracts/                # Solidity smart contracts
+	AchievementNFT.sol
+	Blackjack.sol
+	BlackjackAchievementNFT.sol
+	CoinFlip.sol
+	Lock.sol
+	Lottery.sol
+	LotteryAchievementNFT.sol
+	LotteryTicket.sol
+	security/
+		ReentrancyGuard.sol
 
-frontend/          # Simple web frontend (index.html)
-scripts/           # Deployment and utility scripts
-  autoDraw.js
-  deploy.js
-test/              # Test scripts for contracts
-  CoinFlip.js
-  CoinFlipNFT.js
-  Lock.js
-hardhat.config.js  # Hardhat configuration
-package.json       # Project dependencies and scripts
+frontend/                 # Simple web frontend
+	index.html
+
+scripts/                  # Deployment and utility scripts
+	autoDraw.js
+	deploy.js
+
+test/                     # Test scripts for contracts
+	CoinFlip.js
+	CoinFlipNFT.js
+	Lock.js
+
+bj_abi.txt                # Blackjack contract ABI
+frontend_head.txt         # HTML head template
+hardhat.config.js         # Hardhat configuration
+package.json              # Project dependencies and scripts
+package-lock.json         # Lockfile for npm dependencies
 ```
 
 ## Getting Started
 
 1. **Install dependencies:**
-	```sh
-	npm install
-	```
+    ```sh
+    npm install
+    ```
 
 2. **Start Hardhat local node:**
-	```sh
-	npx hardhat node
-	```
+    ```sh
+    npx hardhat node
+    ```
 
 3. **Deploy contracts:**
-	```sh
-	npx hardhat run scripts/deploy.js --network localhost
-	```
+    ```sh
+    npx hardhat run scripts/deploy.js --network localhost
+    ```
 
 4. **Run the frontend:**
-	```sh
-	npx http-server ./frontend -p 8000
-	```
-	Then open [http://localhost:8000](http://localhost:8000) in your browser.
+    ```sh
+    npx http-server ./frontend -p 8000
+    ```
+    Then open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ## Contracts Overview
 
@@ -68,6 +77,7 @@ package.json       # Project dependencies and scripts
 - **Lottery.sol**: Buy NFT tickets, auto-draw when pool threshold is met, winner gets prize and NFT.
 - **AchievementNFT.sol / LotteryAchievementNFT.sol / BlackjackAchievementNFT.sol**: ERC721 NFT contracts for achievements.
 - **LotteryTicket.sol**: ERC721 NFT representing lottery tickets.
+- **Lock.sol**: Example contract (from Hardhat template).
 - **security/ReentrancyGuard.sol**: Protects against reentrancy attacks.
 
 ## Testing
