@@ -1,5 +1,6 @@
 
-# FITE 2010 Group Project
+# Lucky Ledger
+## FITE2010 Group Project
 
 A decentralized gaming platform built with Hardhat, featuring smart contracts for Blackjack, Coin Flip, and Lottery games, with NFT-based achievements and a simple web frontend.
 
